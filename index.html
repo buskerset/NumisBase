@@ -1,0 +1,1102 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🪙 NumisBase</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Mono:wght@400;500&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+/* ===================== THEMES ===================== */
+:root { --gold:#c9a84c;--gold-light:#f0d080;--gold-dark:#8a6a1e;--accent:#e8543a;--green:#5ab87a;--blue:#5a9fd4;--purple:#9b7fd4;--radius:12px; }
+body.theme-dark { --bg:#0f0e0b;--bg2:#1a1814;--bg3:#231f1a;--surface:#2a2520;--surface2:#332e27;--text:#f0e8d0;--text2:#a89880;--text3:#6a5c48;--border:rgba(201,168,76,0.2);--shadow:rgba(0,0,0,0.5); }
+body.theme-light { --bg:#f5f0e8;--bg2:#ffffff;--bg3:#ede6d8;--surface:#ede6d8;--surface2:#e0d8c8;--text:#2a1f0e;--text2:#7a6040;--text3:#b09060;--border:rgba(139,100,30,0.2);--shadow:rgba(0,0,0,0.12); }
+body.theme-blue { --bg:#0a0f1a;--bg2:#111827;--bg3:#1a2235;--surface:#1e2d42;--surface2:#243452;--text:#dce8f8;--text2:#7a9fc0;--text3:#3a5a7a;--border:rgba(90,159,212,0.25);--shadow:rgba(0,0,0,0.5);--gold:#5a9fd4;--gold-light:#90c8f0;--gold-dark:#2a6090; }
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:'DM Sans',sans-serif;min-height:100vh;transition:background 0.3s,color 0.3s;}
+body.theme-dark{background-image:radial-gradient(ellipse at 20% 0%,rgba(201,168,76,0.06) 0%,transparent 60%),radial-gradient(ellipse at 80% 100%,rgba(201,168,76,0.04) 0%,transparent 60%);}
+body.theme-blue{background-image:radial-gradient(ellipse at 20% 0%,rgba(90,159,212,0.08) 0%,transparent 60%);}
+
+/* HEADER */
+header{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 28px;display:flex;align-items:center;justify-content:space-between;height:68px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px var(--shadow);}
+.logo{display:flex;align-items:center;gap:12px;}
+.logo-icon{width:38px;height:38px;background:radial-gradient(circle at 35% 35%,var(--gold-light),var(--gold-dark));border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:18px;box-shadow:0 0 16px rgba(201,168,76,0.35);}
+.logo h1{font-family:'Playfair Display',serif;font-size:21px;color:var(--gold-light);}
+.logo span{font-size:11px;color:var(--text2);font-family:'DM Mono',monospace;display:block;margin-top:-1px;}
+.header-right{display:flex;align-items:center;gap:16px;}
+.header-stats{display:flex;gap:10px;}
+.stat-pill{background:var(--surface);border:1px solid var(--border);border-radius:20px;padding:5px 13px;font-family:'DM Mono',monospace;font-size:11px;color:var(--text2);}
+.stat-pill strong{color:var(--gold);}
+
+/* THEME SWITCHER */
+.theme-switcher{display:flex;align-items:center;gap:6px;}
+.theme-switcher>span{font-size:14px;}
+.theme-btn{width:26px;height:26px;border-radius:50%;border:2px solid transparent;cursor:pointer;transition:all 0.2s;}
+.theme-btn.active{border-color:var(--gold);transform:scale(1.15);box-shadow:0 0 8px rgba(201,168,76,0.4);}
+.theme-btn.t-dark{background:radial-gradient(circle at 40% 40%,#3a3020,#0f0e0b);}
+.theme-btn.t-light{background:radial-gradient(circle at 40% 40%,#fff8e8,#c8a060);}
+.theme-btn.t-blue{background:radial-gradient(circle at 40% 40%,#2060a0,#0a0f1a);}
+
+/* LAYOUT */
+.container{max-width:1440px;margin:0 auto;padding:24px 28px;}
+
+/* TABS */
+.tabs{display:flex;gap:3px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:4px;margin-bottom:24px;width:fit-content;flex-wrap:wrap;}
+.tab{padding:9px 18px;border-radius:8px;border:none;background:transparent;color:var(--text2);cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;transition:all 0.2s;white-space:nowrap;}
+.tab.active{background:var(--surface2);color:var(--gold-light);}
+.tab:hover:not(.active){color:var(--text);}
+
+/* SECTIONS */
+.section{display:none;}.section.active{display:block;}
+
+/* FORM */
+.form-card{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px;}
+.form-title{font-family:'Playfair Display',serif;font-size:22px;color:var(--gold-light);margin-bottom:24px;}
+.form-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;}
+.form-group{display:flex;flex-direction:column;gap:7px;position:relative;}
+.form-group.full{grid-column:1/-1;}.form-group.half{grid-column:span 2;}
+label{font-size:11px;font-weight:500;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;font-family:'DM Mono',monospace;}
+input,select,textarea{background:var(--surface);border:1px solid var(--border);border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;font-size:14px;padding:10px 13px;transition:border-color 0.2s,box-shadow 0.2s;width:100%;}
+input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold);box-shadow:0 0 0 3px rgba(201,168,76,0.12);}
+select option{background:var(--bg2);color:var(--text);}
+textarea{resize:vertical;min-height:78px;}
+
+/* AUTOCOMPLETE */
+.ac-wrap{position:relative;}
+.ac-list{position:absolute;top:calc(100% + 4px);left:0;right:0;background:var(--bg2);border:1px solid var(--gold);border-radius:8px;z-index:200;max-height:200px;overflow-y:auto;box-shadow:0 8px 24px var(--shadow);display:none;}
+.ac-item{padding:9px 14px;cursor:pointer;font-size:14px;color:var(--text);transition:background 0.12s;}
+.ac-item:hover,.ac-item.hi{background:var(--surface2);color:var(--gold-light);}
+.ac-item strong{color:var(--gold);}
+
+/* PRICES */
+.price-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;}
+.price-wrap{position:relative;}
+.price-wrap>span{position:absolute;left:11px;top:50%;transform:translateY(-50%);color:var(--gold);font-family:'DM Mono',monospace;font-size:12px;pointer-events:none;}
+.price-wrap input{padding-left:30px;}
+
+/* ERROR BLOCK */
+.error-block{background:var(--surface);border:1px solid rgba(232,84,58,0.2);border-radius:10px;padding:18px;grid-column:1/-1;}
+.error-block-title{font-size:11px;color:var(--accent);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;}
+.eg{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.chk{display:flex;align-items:center;gap:9px;}
+.chk input[type=checkbox]{width:17px;height:17px;flex-shrink:0;accent-color:var(--accent);}
+.chk label{text-transform:none;font-size:14px;letter-spacing:0;color:var(--text);cursor:pointer;}
+
+/* COLLECTION BLOCK */
+.col-block{background:var(--surface);border:1px solid rgba(90,155,212,0.2);border-radius:10px;padding:18px;grid-column:1/-1;}
+.col-block-title{font-size:11px;color:var(--blue);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:12px;}
+
+/* IMG UPLOAD */
+.img-up{border:2px dashed var(--border);border-radius:10px;padding:18px;text-align:center;cursor:pointer;transition:border-color 0.2s;position:relative;}
+.img-up:hover{border-color:var(--gold);}
+.img-up input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.img-up p{color:var(--text2);font-size:12px;}
+.img-up .ico{font-size:22px;margin-bottom:4px;}
+.img-prev{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px;justify-content:center;}
+.img-prev img{width:68px;height:68px;object-fit:cover;border-radius:8px;border:1px solid var(--border);}
+
+/* BUTTONS */
+.btn-row{display:flex;gap:10px;margin-top:22px;justify-content:flex-end;}
+.btn{padding:10px 22px;border-radius:8px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:500;transition:all 0.2s;}
+.btn-primary{background:linear-gradient(135deg,var(--gold),var(--gold-dark));color:#1a1200;box-shadow:0 4px 14px rgba(201,168,76,0.28);}
+.btn-primary:hover{transform:translateY(-1px);box-shadow:0 6px 18px rgba(201,168,76,0.38);}
+.btn-secondary{background:var(--surface);color:var(--text2);border:1px solid var(--border);}
+.btn-secondary:hover{color:var(--text);border-color:var(--gold);}
+.btn-danger{background:rgba(232,84,58,0.12);color:var(--accent);border:1px solid rgba(232,84,58,0.28);padding:5px 12px;font-size:12px;}
+.btn-purple{background:rgba(155,127,212,0.15);color:var(--purple);border:1px solid rgba(155,127,212,0.3);}
+.btn-purple:hover{background:rgba(155,127,212,0.25);}
+
+/* FILTERS */
+.filters-bar{background:var(--bg2);border:1px solid var(--border);border-radius:var(--radius);padding:16px 20px;margin-bottom:18px;display:flex;flex-wrap:wrap;gap:10px;align-items:flex-end;}
+.fg{display:flex;flex-direction:column;gap:5px;min-width:130px;flex:1;}
+.fg label{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.8px;}
+.fg select,.fg input{font-size:13px;padding:8px 11px;}
+.si{position:relative;flex:2;min-width:180px;}
+.si input{padding-left:34px;}
+.si .sico{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none;font-size:14px;}
+
+/* VIEW TOGGLE */
+.view-toggle{display:flex;border:1px solid var(--border);border-radius:8px;overflow:hidden;}
+.view-btn{padding:7px 13px;border:none;background:transparent;color:var(--text2);cursor:pointer;font-size:16px;transition:all 0.2s;}
+.view-btn.active{background:var(--surface2);color:var(--gold);}
+
+/* TABLE */
+.table-wrap{overflow-x:auto;border-radius:var(--radius);border:1px solid var(--border);}
+table{width:100%;border-collapse:collapse;font-size:13px;}
+thead{background:var(--bg3);}
+th{padding:11px 13px;text-align:left;font-family:'DM Mono',monospace;font-size:10px;color:var(--text2);text-transform:uppercase;letter-spacing:0.8px;border-bottom:1px solid var(--border);cursor:pointer;white-space:nowrap;user-select:none;}
+th:hover{color:var(--gold);}
+td{padding:10px 13px;border-bottom:1px solid rgba(201,168,76,0.06);vertical-align:middle;}
+tr:last-child td{border-bottom:none;}
+tr:hover td{background:rgba(201,168,76,0.03);}
+.ct{width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--border);}
+.cp{width:36px;height:36px;border-radius:50%;background:var(--surface2);border:2px solid var(--border);display:flex;align-items:center;justify-content:center;font-size:16px;}
+
+/* BADGES */
+.badge{display:inline-block;padding:2px 9px;border-radius:20px;font-size:10px;font-family:'DM Mono',monospace;font-weight:500;white-space:nowrap;}
+.bg{background:rgba(201,168,76,0.14);color:var(--gold);border:1px solid rgba(201,168,76,0.28);}
+.br{background:rgba(232,84,58,0.11);color:var(--accent);border:1px solid rgba(232,84,58,0.24);}
+.bb{background:rgba(90,155,212,0.11);color:var(--blue);border:1px solid rgba(90,155,212,0.24);}
+.bv{background:rgba(90,184,122,0.11);color:var(--green);border:1px solid rgba(90,184,122,0.24);}
+.bp{background:rgba(155,127,212,0.11);color:var(--purple);border:1px solid rgba(155,127,212,0.24);}
+.bgr{background:var(--surface2);color:var(--text2);}
+
+/* CARDS */
+.cards-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(225px,1fr));gap:16px;}
+.coin-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;overflow:hidden;transition:transform 0.2s,box-shadow 0.2s;cursor:pointer;}
+.coin-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px var(--shadow),0 0 0 1px rgba(201,168,76,0.18);}
+.card-img{width:100%;height:148px;background:var(--surface);display:flex;align-items:center;justify-content:center;font-size:42px;color:var(--text3);overflow:hidden;}
+.card-img img{width:100%;height:100%;object-fit:cover;}
+.card-body{padding:13px;}
+.card-name{font-family:'Playfair Display',serif;font-size:15px;color:var(--gold-light);margin-bottom:2px;}
+.card-sub{font-size:11px;color:var(--text2);font-family:'DM Mono',monospace;margin-bottom:9px;}
+.card-tags{display:flex;flex-wrap:wrap;gap:4px;margin-bottom:9px;}
+.card-prices{display:flex;gap:7px;font-family:'DM Mono',monospace;font-size:11px;flex-wrap:wrap;}
+.card-price{color:var(--green);}
+.card-price span{color:var(--text3);font-size:9px;}
+.card-footer{display:flex;justify-content:space-between;align-items:center;padding:8px 13px;border-top:1px solid var(--border);background:var(--bg3);}
+.card-owner{font-size:10px;color:var(--text2);font-family:'DM Mono',monospace;}
+
+/* LOTES */
+.lotes-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(360px,1fr));gap:18px;}
+.lote-card{background:var(--bg2);border:1px solid rgba(155,127,212,0.28);border-radius:14px;overflow:hidden;}
+.lote-header{background:linear-gradient(135deg,rgba(155,127,212,0.14),rgba(155,127,212,0.04));padding:15px 18px;border-bottom:1px solid rgba(155,127,212,0.18);}
+.lote-title{font-family:'Playfair Display',serif;font-size:17px;color:var(--gold-light);margin-bottom:4px;}
+.lote-meta{font-size:11px;color:var(--text2);font-family:'DM Mono',monospace;display:flex;gap:12px;flex-wrap:wrap;}
+.lote-desc-txt{font-size:12px;color:var(--text2);margin-top:7px;font-style:italic;}
+.lote-body{padding:15px 18px;}
+.lote-coin-list{display:flex;flex-direction:column;gap:6px;margin-bottom:12px;}
+.lci{display:flex;align-items:center;gap:9px;padding:7px 10px;background:var(--surface);border-radius:8px;font-size:13px;}
+.lci img{width:28px;height:28px;border-radius:50%;object-fit:cover;border:1px solid var(--border);flex-shrink:0;}
+.lci-ico{width:28px;height:28px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
+.lote-totals{display:flex;gap:12px;flex-wrap:wrap;padding-top:10px;border-top:1px solid var(--border);}
+.lt{font-family:'DM Mono',monospace;font-size:12px;}
+.lt span{color:var(--text3);display:block;font-size:9px;text-transform:uppercase;}
+.lt strong{color:var(--green);}
+.lote-footer{display:flex;gap:7px;padding:11px 18px;border-top:1px solid var(--border);background:var(--bg3);}
+
+/* COIN PICKER */
+.coin-picker{border:1px solid var(--border);border-radius:10px;overflow:hidden;}
+.cp-header{background:var(--bg3);padding:10px 14px;display:flex;gap:8px;align-items:center;}
+.cp-header input{flex:1;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);padding:7px 10px;font-size:13px;}
+.cp-header select{width:auto;flex:none;padding:7px 10px;font-size:12px;background:var(--surface);border:1px solid var(--border);border-radius:6px;color:var(--text);}
+.cp-list{max-height:270px;overflow-y:auto;}
+.cp-item{display:flex;align-items:center;gap:9px;padding:8px 14px;border-bottom:1px solid rgba(201,168,76,0.06);cursor:pointer;transition:background 0.12s;}
+.cp-item:hover{background:var(--surface);}
+.cp-item:last-child{border-bottom:none;}
+.cp-item input[type=checkbox]{width:15px;height:15px;accent-color:var(--purple);flex-shrink:0;}
+.cp-item img{width:30px;height:30px;border-radius:50%;object-fit:cover;border:1px solid var(--border);}
+.cp-ico{width:30px;height:30px;border-radius:50%;background:var(--surface2);display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.cp-info{flex:1;}
+.cp-name{font-size:13px;color:var(--text);font-weight:500;}
+.cp-sub{font-size:11px;color:var(--text2);font-family:'DM Mono',monospace;}
+.sel-count{font-family:'DM Mono',monospace;font-size:11px;color:var(--purple);}
+
+/* OWNERS */
+.owners-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:14px;}
+.owner-card{background:var(--bg2);border:1px solid var(--border);border-radius:14px;padding:18px;}
+.owner-name{font-family:'Playfair Display',serif;font-size:16px;color:var(--gold-light);margin-bottom:3px;}
+.owner-count{font-family:'DM Mono',monospace;font-size:11px;color:var(--text2);margin-bottom:11px;}
+
+/* MISC */
+.sh{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px;flex-wrap:wrap;gap:10px;}
+.sh h2{font-family:'Playfair Display',serif;font-size:20px;color:var(--gold-light);}
+.exp-btn{background:rgba(90,184,122,0.11);color:var(--green);border:1px solid rgba(90,184,122,0.28);padding:8px 15px;border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:13px;font-weight:500;transition:all 0.2s;}
+.exp-btn:hover{background:rgba(90,184,122,0.2);}
+.empty{text-align:center;padding:52px 20px;color:var(--text3);}
+.empty-icon{font-size:42px;margin-bottom:12px;}
+.empty h3{font-size:16px;color:var(--text2);margin-bottom:6px;}
+.empty p{font-size:13px;}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.72);z-index:300;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.open{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px;max-width:680px;width:100%;max-height:90vh;overflow-y:auto;position:relative;}
+.modal-close{position:absolute;top:13px;right:13px;background:var(--surface);border:none;border-radius:6px;color:var(--text2);cursor:pointer;padding:5px 9px;font-size:15px;}
+.modal-title{font-family:'Playfair Display',serif;font-size:20px;color:var(--gold-light);margin-bottom:18px;}
+.detail-grid{display:grid;grid-template-columns:1fr 1fr;gap:13px;}
+.detail-item label{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.8px;display:block;margin-bottom:3px;}
+.detail-item p{font-size:14px;color:var(--text);}
+.detail-imgs{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.detail-imgs img{width:110px;height:110px;object-fit:cover;border-radius:10px;border:1px solid var(--border);}
+
+/* BACKUP */
+.backup-bar{background:var(--bg3);border-bottom:1px solid var(--border);padding:7px 28px;display:flex;align-items:center;gap:10px;font-size:12px;color:var(--text3);font-family:'DM Mono',monospace;}
+.backup-bar span{flex:1;}
+.backup-btn{display:flex;align-items:center;gap:6px;padding:6px 14px;border-radius:7px;border:none;cursor:pointer;font-family:'DM Sans',sans-serif;font-size:12px;font-weight:500;transition:all 0.18s;white-space:nowrap;}
+.backup-btn.export{background:rgba(90,184,122,0.13);color:var(--green);border:1px solid rgba(90,184,122,0.3);}
+.backup-btn.export:hover{background:rgba(90,184,122,0.22);}
+.backup-btn.import{background:rgba(90,155,212,0.13);color:var(--blue);border:1px solid rgba(90,155,212,0.3);}
+.backup-btn.import:hover{background:rgba(90,155,212,0.22);}
+.backup-btn.danger{background:rgba(232,84,58,0.1);color:var(--accent);border:1px solid rgba(232,84,58,0.25);}
+.backup-btn.danger:hover{background:rgba(232,84,58,0.18);}
+/* MODAL BACKUP */
+.backup-modal{background:var(--bg2);border:1px solid var(--border);border-radius:16px;padding:28px;max-width:520px;width:100%;position:relative;}
+.backup-drop{border:2px dashed var(--border);border-radius:12px;padding:32px 20px;text-align:center;cursor:pointer;transition:border-color 0.2s,background 0.2s;position:relative;margin:16px 0;}
+.backup-drop:hover,.backup-drop.drag{border-color:var(--blue);background:rgba(90,155,212,0.06);}
+.backup-drop input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
+.backup-drop .bd-ico{font-size:36px;margin-bottom:10px;}
+.backup-drop p{color:var(--text2);font-size:13px;}
+.backup-drop p strong{color:var(--blue);}
+.backup-info{background:var(--surface);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--text2);margin-bottom:16px;line-height:1.6;}
+.backup-info strong{color:var(--text);}
+
+/* TOAST */
+.toast{position:fixed;bottom:26px;right:26px;background:var(--surface2);border:1px solid var(--gold);border-radius:10px;padding:11px 17px;color:var(--gold-light);font-size:13px;transform:translateY(100px);opacity:0;transition:all 0.3s;z-index:400;}
+.toast.show{transform:translateY(0);opacity:1;}
+
+@media(max-width:900px){.form-grid{grid-template-columns:1fr 1fr;}.header-stats{display:none;}.price-row{grid-template-columns:1fr;}.eg{grid-template-columns:1fr;}}
+@media(max-width:600px){.form-grid{grid-template-columns:1fr;}.form-group.half{grid-column:span 1;}header{padding:0 14px;}.container{padding:14px;}.tabs{width:100%;}}
+</style>
+</head>
+<body class="theme-dark">
+
+<header>
+  <div class="logo">
+    <div class="logo-icon">🪙</div>
+    <div><h1>NumisBase</h1><span>Catálogo de Monedas</span></div>
+  </div>
+  <div class="header-right">
+    <div class="header-stats">
+      <div class="stat-pill">Total: <strong id="st-total">0</strong></div>
+      <div class="stat-pill">Dueños: <strong id="st-duenos">0</strong></div>
+      <div class="stat-pill">Lotes: <strong id="st-lotes">0</strong></div>
+      <div class="stat-pill">Errores: <strong id="st-errors">0</strong></div>
+    </div>
+    <div class="theme-switcher">
+      <span>🎨</span>
+      <button class="theme-btn t-dark active" title="Oscuro" onclick="setTheme('dark',this)"></button>
+      <button class="theme-btn t-light" title="Claro" onclick="setTheme('light',this)"></button>
+      <button class="theme-btn t-blue" title="Azul noche" onclick="setTheme('blue',this)"></button>
+    </div>
+  </div>
+</header>
+
+<!-- BACKUP BAR -->
+<div class="backup-bar">
+  <span id="backup-last-txt">💾 Backup: nunca exportado</span>
+  <button class="backup-btn export" onclick="exportBackup()">⬇️ Exportar Backup</button>
+  <button class="backup-btn import" onclick="openImportModal()">⬆️ Importar Backup</button>
+  <button class="backup-btn danger" onclick="clearAllData()">🗑️ Borrar todo</button>
+</div>
+
+<!-- MODAL IMPORT -->
+<div class="modal-overlay" id="modal-import" onclick="if(event.target===this)closeImportModal()">
+  <div class="backup-modal">
+    <button class="modal-close" onclick="closeImportModal()">✕</button>
+    <div class="modal-title">⬆️ Importar Backup</div>
+    <div class="backup-info">
+      Seleccioná un archivo <strong>.json</strong> exportado desde NumisBase.<br>
+      Los datos actuales serán <strong>reemplazados</strong> por los del backup.<br>
+      Se importan: monedas, dueños, colecciones y lotes.
+    </div>
+    <div class="backup-drop" id="backup-drop"
+      ondragover="event.preventDefault();this.classList.add('drag')"
+      ondragleave="this.classList.remove('drag')"
+      ondrop="event.preventDefault();this.classList.remove('drag');handleImportFile({files:event.dataTransfer.files})">
+      <input type="file" id="import-file" accept=".json" onchange="handleImportFile(this)">
+      <div class="bd-ico">📂</div>
+      <p><strong>Clic para seleccionar</strong> o arrastrá el archivo acá</p>
+      <p style="margin-top:6px;font-size:11px;color:var(--text3)">Solo archivos .json de NumisBase</p>
+    </div>
+    <div id="import-preview" style="display:none;margin-bottom:16px;background:var(--surface);border-radius:10px;padding:14px 16px;font-size:13px;color:var(--text2);line-height:1.7"></div>
+    <div class="btn-row" style="margin-top:0">
+      <button class="btn btn-secondary" onclick="closeImportModal()">Cancelar</button>
+      <button class="btn btn-primary" id="import-confirm-btn" style="display:none" onclick="confirmImport()">✅ Confirmar Importación</button>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+  <div class="tabs">
+    <button class="tab active" data-tab="agregar" onclick="showTab('agregar',this)">➕ Agregar Moneda</button>
+    <button class="tab" data-tab="coleccion" onclick="showTab('coleccion',this)">📋 Mi Colección</button>
+    <button class="tab" data-tab="lotes" onclick="showTab('lotes',this)">📦 Lotes de Venta</button>
+    <button class="tab" data-tab="duenos" onclick="showTab('duenos',this)">👤 Dueños</button>
+  </div>
+
+  <!-- ===== TAB AGREGAR ===== -->
+  <div id="tab-agregar" class="section active">
+    <div class="form-card">
+      <div class="form-title" id="form-title-lbl">➕ Nueva Moneda</div>
+      <div class="form-grid">
+
+        <div class="form-group"><label>👤 Dueño</label><select id="f-dueno"><option value="">— Seleccionar —</option></select></div>
+
+        <div class="form-group ac-wrap">
+          <label>🌍 País / Origen</label>
+          <input type="text" id="f-pais" placeholder="Escribir país..." autocomplete="off"
+            oninput="showAC('f-pais','ac-pais',getPaises())" onkeydown="acKey(event,'ac-pais','f-pais')" onclick="event.stopPropagation()">
+          <div class="ac-list" id="ac-pais"></div>
+        </div>
+
+        <div class="form-group ac-wrap">
+          <label>📅 Año</label>
+          <input type="text" id="f-anio" placeholder="Ej: 1950" autocomplete="off" maxlength="4"
+            oninput="showAC('f-anio','ac-anio',getAnios())" onkeydown="acKey(event,'ac-anio','f-anio')" onclick="event.stopPropagation()">
+          <div class="ac-list" id="ac-anio"></div>
+        </div>
+
+        <div class="form-group"><label>💲 Denominación</label><input type="text" id="f-denom" placeholder="Ej: 1 Peso, 50 Centavos..."></div>
+
+        <div class="form-group"><label>⚗️ Material</label>
+          <select id="f-mat"><option value="">— Seleccionar —</option>
+            <option>Oro</option><option>Plata</option><option>Cobre</option><option>Bronce</option>
+            <option>Níquel</option><option>Aluminio</option><option>Bimetálica</option>
+            <option>Acero inoxidable</option><option>Latón</option><option>Otro</option>
+          </select>
+        </div>
+
+        <div class="form-group"><label>🔍 Conservación</label>
+          <select id="f-cons"><option value="">— Seleccionar —</option>
+            <option>Flor de cuño (FDC)</option><option>Sin circular (SC)</option>
+            <option>Muy bien conservada (MBC)</option><option>Bien conservada (BC)</option>
+            <option>Regular (RC)</option><option>Muy circulada (MC)</option>
+          </select>
+        </div>
+
+        <div class="form-group"><label>🏛️ Colección</label><select id="f-col"><option value="">Ninguna / Individual</option></select></div>
+
+        <div class="form-group"><label>⭐ Rareza</label>
+          <select id="f-rareza"><option value="">— Seleccionar —</option>
+            <option>Común</option><option>Poco común</option><option>Rara</option>
+            <option>Muy rara</option><option>Extremadamente rara</option>
+          </select>
+        </div>
+
+        <div class="form-group"><label>🏭 Ceca</label><input type="text" id="f-ceca" placeholder="Ej: Buenos Aires, Lima..."></div>
+
+        <div class="form-group full"><label>💰 Precios</label>
+          <div class="price-row">
+            <div class="price-wrap"><span>$</span><input type="number" id="f-ars" placeholder="Pesos" min="0"></div>
+            <div class="price-wrap"><span>U$</span><input type="number" id="f-usd" placeholder="Dólares" min="0"></div>
+            <div class="price-wrap"><span>€</span><input type="number" id="f-eur" placeholder="Euros" min="0"></div>
+          </div>
+        </div>
+
+        <div class="form-group half"><label>📝 Notas</label><textarea id="f-notas" placeholder="Observaciones..."></textarea></div>
+
+        <div class="form-group"><label>📷 Foto(s) de la Moneda</label>
+          <div class="img-up"><input type="file" id="f-img-main" accept="image/*" multiple onchange="prevImgs(this,'prev-main')"><div class="ico">📷</div><p>Clic para subir</p></div>
+          <div class="img-prev" id="prev-main"></div>
+        </div>
+
+        <!-- ERROR BLOCK -->
+        <div class="error-block">
+          <div class="error-block-title">⚠️ Error de Acuñación</div>
+          <div class="eg">
+            <div class="chk"><input type="checkbox" id="f-error" onchange="toggleErr()"><label for="f-error">Esta moneda tiene un error de acuñación</label></div>
+            <div></div>
+            <div class="form-group" id="err-tipo-w" style="display:none"><label>Tipo de Error</label>
+              <select id="f-err-tipo"><option value="">— Seleccionar —</option>
+                <option>Doble acuñación</option><option>Desplazamiento del cuño</option>
+                <option>Cuño torcido</option><option>Laminación defectuosa</option>
+                <option>Cospel incorrecto</option><option>Letra / número faltante</option>
+                <option>Reverso girado</option><option>Rebaba de cuño</option><option>Otro</option>
+              </select>
+            </div>
+            <div class="form-group" id="err-desc-w" style="display:none"><label>Descripción del Error</label><textarea id="f-err-desc" placeholder="Describir el error..."></textarea></div>
+            <div class="form-group" id="err-foto-w" style="display:none"><label>📷 Foto del Error</label>
+              <div class="img-up"><input type="file" id="f-img-err" accept="image/*" multiple onchange="prevImgs(this,'prev-err')"><div class="ico">🔬</div><p>Foto del error</p></div>
+              <div class="img-prev" id="prev-err"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- COLECCIÓN CONMEMORATIVA -->
+        <div class="col-block">
+          <div class="col-block-title">🏛️ Colección / Conmemorativa</div>
+          <div class="eg">
+            <div class="form-group"><label>Nombre de la Serie</label><input type="text" id="f-serie" placeholder="Ej: Bicentenario..."></div>
+            <div class="form-group"><label>Número en la Serie</label><input type="text" id="f-serie-n" placeholder="Ej: 3 de 12"></div>
+            <div class="form-group"><label>Motivo Conmemorativo</label><input type="text" id="f-motivo" placeholder="Ej: Fundación..."></div>
+            <div class="form-group"><label>Tirada / Emisión</label><input type="text" id="f-tirada" placeholder="Ej: 10.000 ejemplares"></div>
+          </div>
+        </div>
+
+      </div>
+      <div class="btn-row">
+        <button class="btn btn-secondary" onclick="clearForm()">🗑️ Limpiar</button>
+        <button class="btn btn-primary" onclick="saveMoneda()">💾 Guardar Moneda</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== TAB COLECCIÓN ===== -->
+  <div id="tab-coleccion" class="section">
+    <div class="sh">
+      <h2>📋 Mi Colección</h2>
+      <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap">
+        <button class="exp-btn" onclick="exportCSV()">📊 Exportar CSV</button>
+        <div class="view-toggle">
+          <button class="view-btn active" id="vbtn-tabla" onclick="setView('tabla')" title="Tabla">☰</button>
+          <button class="view-btn" id="vbtn-cards" onclick="setView('cards')" title="Tarjetas">⊞</button>
+        </div>
+      </div>
+    </div>
+    <div class="filters-bar">
+      <div class="si"><span class="sico">🔍</span><input type="text" id="fs" placeholder="Buscar país, año, denominación..." oninput="renderCol()"></div>
+      <div class="fg"><label>Dueño</label><select id="fd" onchange="renderCol()"><option value="">Todos</option></select></div>
+      <div class="fg"><label>Material</label>
+        <select id="fm" onchange="renderCol()"><option value="">Todos</option>
+          <option>Oro</option><option>Plata</option><option>Cobre</option><option>Bronce</option>
+          <option>Níquel</option><option>Aluminio</option><option>Bimetálica</option><option>Acero inoxidable</option><option>Latón</option><option>Otro</option>
+        </select>
+      </div>
+      <div class="fg"><label>Conservación</label>
+        <select id="fc" onchange="renderCol()"><option value="">Todos</option>
+          <option>Flor de cuño (FDC)</option><option>Sin circular (SC)</option>
+          <option>Muy bien conservada (MBC)</option><option>Bien conservada (BC)</option>
+          <option>Regular (RC)</option><option>Muy circulada (MC)</option>
+        </select>
+      </div>
+      <div class="fg"><label>Error</label>
+        <select id="fe" onchange="renderCol()"><option value="">Todos</option><option value="si">Con error</option><option value="no">Sin error</option></select>
+      </div>
+      <div class="fg"><label>Colección</label><select id="fco" onchange="renderCol()"><option value="">Todas</option></select></div>
+      <div class="fg"><label>Lote</label>
+        <select id="fl" onchange="renderCol()"><option value="">Todos</option><option value="en">En lote</option><option value="no">Sin lote</option></select>
+      </div>
+      <button class="btn btn-secondary" style="padding:8px 13px;font-size:13px" onclick="clearFilters()">✕</button>
+    </div>
+    <div id="view-tabla"><div class="table-wrap"><table>
+      <thead><tr>
+        <th></th>
+        <th onclick="sortBy('pais')">País ↕</th><th onclick="sortBy('anio')">Año ↕</th>
+        <th onclick="sortBy('denominacion')">Denominación ↕</th><th onclick="sortBy('material')">Material ↕</th>
+        <th onclick="sortBy('conservacion')">Conservación ↕</th><th onclick="sortBy('dueno')">Dueño ↕</th>
+        <th>$ ARS</th><th>U$ USD</th><th>€ EUR</th>
+        <th>Error</th><th>Colección</th><th>Lote</th><th></th>
+      </tr></thead>
+      <tbody id="tbody"></tbody>
+    </table></div></div>
+    <div id="view-cards" style="display:none"><div class="cards-grid" id="cards-body"></div></div>
+    <div id="col-empty" class="empty" style="display:none"><div class="empty-icon">🪙</div><h3>Sin monedas</h3><p>Agregá desde la pestaña "Agregar Moneda"</p></div>
+  </div>
+
+  <!-- ===== TAB LOTES ===== -->
+  <div id="tab-lotes" class="section">
+    <div class="sh">
+      <h2>📦 Lotes de Venta</h2>
+      <button class="btn btn-purple" onclick="openLoteModal()">➕ Crear Lote</button>
+    </div>
+    <div class="lotes-grid" id="lotes-grid"></div>
+    <div id="lotes-empty" class="empty" style="display:none"><div class="empty-icon">📦</div><h3>Sin lotes todavía</h3><p>Creá un lote para agrupar monedas para la venta</p></div>
+  </div>
+
+  <!-- ===== TAB DUEÑOS ===== -->
+  <div id="tab-duenos" class="section">
+    <div class="sh"><h2>👤 Gestionar Dueños</h2></div>
+    <div class="form-card" style="margin-bottom:20px;padding:18px 22px">
+      <div style="display:flex;gap:10px;align-items:flex-end">
+        <div class="form-group" style="flex:1"><label>Nombre del Dueño</label><input type="text" id="new-owner" placeholder="Nombre..." onkeydown="if(event.key==='Enter')addOwner()"></div>
+        <button class="btn btn-primary" onclick="addOwner()">➕ Agregar</button>
+      </div>
+    </div>
+    <div class="owners-grid" id="owners-grid"></div>
+    <div style="margin-top:32px"><div class="sh"><h2>🏛️ Gestionar Colecciones</h2></div>
+      <div class="form-card" style="margin-bottom:20px;padding:18px 22px">
+        <div style="display:flex;gap:10px;align-items:flex-end">
+          <div class="form-group" style="flex:1"><label>Nombre de la Colección</label><input type="text" id="new-col" placeholder="Nombre de la colección..." onkeydown="if(event.key==='Enter')addColeccion()"></div>
+          <button class="btn btn-primary" onclick="addColeccion()">➕ Agregar</button>
+        </div>
+      </div>
+      <div class="owners-grid" id="cols-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DETALLE -->
+<div class="modal-overlay" id="modal-det" onclick="if(event.target===this)closeModal()">
+  <div class="modal"><button class="modal-close" onclick="closeModal()">✕</button><div id="modal-content"></div></div>
+</div>
+
+<!-- MODAL LOTE -->
+<div class="modal-overlay" id="modal-lote" onclick="if(event.target===this)closeLoteModal()">
+  <div class="modal" style="max-width:760px">
+    <button class="modal-close" onclick="closeLoteModal()">✕</button>
+    <div class="modal-title" id="lote-modal-title">📦 Nuevo Lote</div>
+    <div class="form-grid" style="margin-bottom:18px">
+      <div class="form-group half"><label>Nombre del Lote</label><input type="text" id="l-nombre" placeholder="Ej: Plata Argentina siglo XX..."></div>
+      <div class="form-group"><label>Dueño del Lote</label><select id="l-dueno"><option value="">— Seleccionar —</option></select></div>
+      <div class="form-group full"><label>Descripción / Notas</label><textarea id="l-desc" placeholder="Por qué es interesante para coleccionistas..." style="min-height:55px"></textarea></div>
+    </div>
+    <div style="margin-bottom:14px">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px">
+        <label style="font-size:11px;color:var(--text2);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.8px">Seleccionar Monedas</label>
+        <span class="sel-count" id="sel-count">0 seleccionadas</span>
+      </div>
+      <div class="coin-picker">
+        <div class="cp-header">
+          <span>🔍</span>
+          <input type="text" id="cp-search" placeholder="Filtrar por país, año, dueño..." oninput="renderPicker()">
+          <select id="cp-dueno" onchange="renderPicker()"><option value="">Todos los dueños</option></select>
+        </div>
+        <div class="cp-list" id="cp-list"></div>
+      </div>
+    </div>
+    <div class="btn-row">
+      <button class="btn btn-secondary" onclick="closeLoteModal()">Cancelar</button>
+      <button class="btn btn-primary" onclick="saveLote()">💾 Guardar Lote</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// DATA
+let monedas = JSON.parse(localStorage.getItem('nb-monedas')||'[]');
+let duenos = JSON.parse(localStorage.getItem('nb-duenos')||'["Mi colección"]');
+let colecciones = JSON.parse(localStorage.getItem('nb-cols')||'[]');
+let lotes = JSON.parse(localStorage.getItem('nb-lotes')||'[]');
+let editingId = null, editingLoteId = null;
+let sortCol = null, sortDir = 1, curView = 'tabla';
+let selIds = new Set();
+
+const PAISES = ['Argentina','Bolivia','Brasil','Chile','Colombia','Costa Rica','Cuba','Ecuador','El Salvador','España','Estados Unidos','Guatemala','Honduras','México','Nicaragua','Panamá','Paraguay','Perú','Puerto Rico','República Dominicana','Uruguay','Venezuela','Alemania','Austria','Bélgica','Francia','Gran Bretaña','Grecia','Holanda','Italia','Portugal','Rusia','Suecia','Suiza','Australia','Canadá','China','Filipinas','India','Israel','Japón','Sudáfrica','Turquía','Egipto','Marruecos'];
+
+function save() {
+  localStorage.setItem('nb-monedas', JSON.stringify(monedas));
+  localStorage.setItem('nb-duenos', JSON.stringify(duenos));
+  localStorage.setItem('nb-cols', JSON.stringify(colecciones));
+  localStorage.setItem('nb-lotes', JSON.stringify(lotes));
+  updateStats();
+}
+
+// THEME
+function setTheme(t, btn) {
+  document.body.className = 'theme-'+t;
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  localStorage.setItem('nb-theme', t);
+}
+(()=>{
+  const t = localStorage.getItem('nb-theme')||'dark';
+  document.body.className='theme-'+t;
+  document.querySelectorAll('.theme-btn').forEach(b => b.classList.toggle('active', b.classList.contains('t-'+t)));
+})();
+
+// TABS
+function showTab(n, btn) {
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+n).classList.add('active');
+  (btn||document.querySelector('[data-tab="'+n+'"]')).classList.add('active');
+  if(n==='coleccion') renderCol();
+  if(n==='duenos') renderDuenos();
+  if(n==='lotes') renderLotes();
+}
+
+// AUTOCOMPLETE
+function getPaises() { return [...new Set([...PAISES,...monedas.map(m=>m.pais).filter(Boolean)])].sort(); }
+function getAnios() {
+  const used = monedas.map(m=>m.anio).filter(Boolean);
+  const gen = []; for(let y=2025;y>=1800;y--) gen.push(String(y));
+  return [...new Set([...gen,...used])].sort((a,b)=>b-a);
+}
+let acHi=-1;
+function showAC(inp, lid, opts) {
+  const input=document.getElementById(inp), list=document.getElementById(lid);
+  const q=input.value.toLowerCase();
+  if(!q){list.style.display='none';return;}
+  const res=opts.filter(o=>o.toLowerCase().startsWith(q)).slice(0,10);
+  if(!res.length){list.style.display='none';return;}
+  acHi=-1;
+  list.innerHTML=res.map(o=>{
+    const b=`<strong>${o.slice(0,q.length)}</strong>${o.slice(q.length)}`;
+    return `<div class="ac-item" onclick="selAC('${inp}','${lid}','${o.replace(/'/g,"\\'")}');event.stopPropagation()">${b}</div>`;
+  }).join('');
+  list.style.display='block';
+}
+function selAC(inp,lid,val){document.getElementById(inp).value=val;document.getElementById(lid).style.display='none';}
+function acKey(e,lid,inp){
+  const list=document.getElementById(lid);
+  if(list.style.display==='none') return;
+  const items=list.querySelectorAll('.ac-item');
+  if(e.key==='ArrowDown'){acHi=Math.min(acHi+1,items.length-1);}
+  else if(e.key==='ArrowUp'){acHi=Math.max(acHi-1,0);}
+  else if(e.key==='Enter'&&acHi>=0){document.getElementById(inp).value=items[acHi].textContent;list.style.display='none';e.preventDefault();return;}
+  else if(e.key==='Escape'){list.style.display='none';return;}
+  items.forEach((it,i)=>it.classList.toggle('hi',i===acHi));
+}
+document.addEventListener('click',()=>document.querySelectorAll('.ac-list').forEach(l=>l.style.display='none'));
+
+// SELECTS SYNC
+function syncAll() {
+  const ownerSels = ['f-dueno','fd','l-dueno','cp-dueno'];
+  ownerSels.forEach(id=>{
+    const s=document.getElementById(id); if(!s) return;
+    const v=s.value;
+    const isFilter=id==='fd'||id==='cp-dueno';
+    s.innerHTML=isFilter?'<option value="">Todos</option>':'<option value="">— Seleccionar —</option>';
+    duenos.forEach(d=>{const o=document.createElement('option');o.value=d;o.textContent=d;s.appendChild(o);});
+    s.value=v;
+  });
+  ['f-col','fco'].forEach(id=>{
+    const s=document.getElementById(id); if(!s) return;
+    const v=s.value;
+    s.innerHTML=id==='f-col'?'<option value="">Ninguna / Individual</option>':'<option value="">Todas</option>';
+    colecciones.forEach(c=>{const o=document.createElement('option');o.value=c;o.textContent=c;s.appendChild(o);});
+    s.value=v;
+  });
+}
+
+// OWNERS
+function addOwner(){
+  const name=document.getElementById('new-owner').value.trim(); if(!name) return;
+  if(duenos.includes(name)){showToast('⚠️ Ya existe');return;}
+  duenos.push(name); save(); document.getElementById('new-owner').value='';
+  syncAll(); renderDuenos(); showToast('✅ Dueño: '+name);
+}
+function addColeccion(){
+  const name=document.getElementById('new-col').value.trim(); if(!name) return;
+  if(colecciones.includes(name)){showToast('⚠️ Ya existe');return;}
+  colecciones.push(name); save(); document.getElementById('new-col').value='';
+  syncAll(); renderDuenos(); showToast('✅ Colección: '+name);
+}
+function delOwner(n){if(!confirm('¿Eliminar "'+n+'"?'))return;duenos=duenos.filter(d=>d!==n);save();syncAll();renderDuenos();}
+function delCol(n){if(!confirm('¿Eliminar "'+n+'"?'))return;colecciones=colecciones.filter(c=>c!==n);save();syncAll();renderDuenos();}
+function renderDuenos(){
+  const og=document.getElementById('owners-grid');
+  og.innerHTML=duenos.length?duenos.map(d=>{const c=monedas.filter(m=>m.dueno===d).length;
+    return`<div class="owner-card"><div class="owner-name">${d}</div><div class="owner-count">${c} moneda${c!==1?'s':''}</div><button class="btn btn-danger" onclick="delOwner('${d}')">🗑️ Eliminar</button></div>`;
+  }).join(''):'<div class="empty"><div class="empty-icon">👤</div><h3>Sin dueños</h3></div>';
+  const cg=document.getElementById('cols-grid');
+  cg.innerHTML=colecciones.length?colecciones.map(c=>{const n=monedas.filter(m=>m.coleccion===c).length;
+    return`<div class="owner-card"><div class="owner-name">🏛️ ${c}</div><div class="owner-count">${n} moneda${n!==1?'s':''}</div><button class="btn btn-danger" onclick="delCol('${c}')">🗑️ Eliminar</button></div>`;
+  }).join(''):'<div class="empty"><div class="empty-icon">🏛️</div><h3>Sin colecciones</h3></div>';
+}
+
+// FORM
+function toggleErr(){
+  const on=document.getElementById('f-error').checked;
+  ['err-tipo-w','err-desc-w','err-foto-w'].forEach(id=>document.getElementById(id).style.display=on?'flex':'none');
+}
+function prevImgs(inp,pid){
+  const p=document.getElementById(pid); p.innerHTML='';
+  Array.from(inp.files).forEach(f=>{const r=new FileReader();r.onload=e=>{const img=document.createElement('img');img.src=e.target.result;p.appendChild(img);};r.readAsDataURL(f);});
+}
+function rb64(file){return new Promise(res=>{const r=new FileReader();r.onload=e=>res(e.target.result);r.readAsDataURL(file);});}
+
+async function saveMoneda(){
+  const pais=document.getElementById('f-pais').value.trim(); if(!pais){showToast('⚠️ Ingresá el país');return;}
+  const mf=document.getElementById('f-img-main').files, ef=document.getElementById('f-img-err').files;
+  const im=[],ie=[];
+  for(let f of mf)im.push(await rb64(f));
+  for(let f of ef)ie.push(await rb64(f));
+  const prev=editingId?monedas.find(m=>m.id===editingId)||{}:{};
+  const m={
+    id:editingId||Date.now().toString(),
+    dueno:document.getElementById('f-dueno').value, pais,
+    anio:document.getElementById('f-anio').value,
+    denominacion:document.getElementById('f-denom').value.trim(),
+    material:document.getElementById('f-mat').value,
+    conservacion:document.getElementById('f-cons').value,
+    rareza:document.getElementById('f-rareza').value,
+    ceca:document.getElementById('f-ceca').value.trim(),
+    coleccion:document.getElementById('f-col').value,
+    precioARS:document.getElementById('f-ars').value,
+    precioUSD:document.getElementById('f-usd').value,
+    precioEUR:document.getElementById('f-eur').value,
+    notas:document.getElementById('f-notas').value.trim(),
+    tieneError:document.getElementById('f-error').checked,
+    errorTipo:document.getElementById('f-err-tipo').value,
+    errorDesc:document.getElementById('f-err-desc').value.trim(),
+    serieNombre:document.getElementById('f-serie').value.trim(),
+    serieNumero:document.getElementById('f-serie-n').value.trim(),
+    motivo:document.getElementById('f-motivo').value.trim(),
+    tirada:document.getElementById('f-tirada').value.trim(),
+    imgMain:im.length?im:(prev.imgMain||[]),
+    imgError:ie.length?ie:(prev.imgError||[]),
+    fecha:new Date().toLocaleDateString('es-AR'),
+  };
+  if(editingId){const i=monedas.findIndex(x=>x.id===editingId);monedas[i]=m;showToast('✅ Actualizada');}
+  else{monedas.push(m);showToast('✅ Guardada: '+pais+(m.anio?' '+m.anio:''));}
+  save();clearForm();
+}
+
+function clearForm(){
+  editingId=null; document.getElementById('form-title-lbl').textContent='➕ Nueva Moneda';
+  ['f-dueno','f-pais','f-anio','f-denom','f-mat','f-cons','f-rareza','f-ceca','f-col','f-ars','f-usd','f-eur','f-notas','f-err-tipo','f-err-desc','f-serie','f-serie-n','f-motivo','f-tirada']
+    .forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});
+  document.getElementById('f-error').checked=false; toggleErr();
+  ['prev-main','prev-err'].forEach(id=>document.getElementById(id).innerHTML='');
+  ['f-img-main','f-img-err'].forEach(id=>document.getElementById(id).value='');
+}
+
+function editMoneda(id){
+  const m=monedas.find(x=>x.id===id); if(!m) return;
+  editingId=id; document.getElementById('form-title-lbl').textContent='✏️ Editar Moneda';
+  const fv={'f-dueno':m.dueno,'f-pais':m.pais,'f-anio':m.anio,'f-denom':m.denominacion,'f-mat':m.material,'f-cons':m.conservacion,'f-rareza':m.rareza,'f-ceca':m.ceca,'f-col':m.coleccion,'f-ars':m.precioARS,'f-usd':m.precioUSD,'f-eur':m.precioEUR,'f-notas':m.notas,'f-err-tipo':m.errorTipo,'f-err-desc':m.errorDesc,'f-serie':m.serieNombre,'f-serie-n':m.serieNumero,'f-motivo':m.motivo,'f-tirada':m.tirada};
+  Object.entries(fv).forEach(([k,v])=>{const el=document.getElementById(k);if(el)el.value=v||'';});
+  document.getElementById('f-error').checked=!!m.tieneError; toggleErr();
+  document.getElementById('prev-main').innerHTML=m.imgMain?m.imgMain.map(s=>`<img src="${s}">`).join(''):'';
+  document.getElementById('prev-err').innerHTML=m.imgError?m.imgError.map(s=>`<img src="${s}">`).join(''):'';
+  showTab('agregar'); document.querySelector('[data-tab="agregar"]').click();
+  window.scrollTo(0,0); closeModal();
+}
+
+function deleteMoneda(id){
+  if(!confirm('¿Eliminar esta moneda?'))return;
+  monedas=monedas.filter(m=>m.id!==id);
+  lotes.forEach(l=>{l.monedaIds=l.monedaIds.filter(mid=>mid!==id);});
+  save(); renderCol(); closeModal(); showToast('🗑️ Eliminada');
+}
+
+// LOTES
+function openLoteModal(id){
+  editingLoteId=id||null; selIds=new Set();
+  document.getElementById('l-nombre').value='';
+  document.getElementById('l-dueno').value='';
+  document.getElementById('l-desc').value='';
+  if(id){
+    const l=lotes.find(x=>x.id===id);
+    if(l){document.getElementById('l-nombre').value=l.nombre;document.getElementById('l-dueno').value=l.dueno||'';document.getElementById('l-desc').value=l.desc||'';selIds=new Set(l.monedaIds);}
+    document.getElementById('lote-modal-title').textContent='✏️ Editar Lote';
+  } else {document.getElementById('lote-modal-title').textContent='📦 Nuevo Lote';}
+  updSelCount(); renderPicker();
+  document.getElementById('modal-lote').classList.add('open');
+}
+function closeLoteModal(){document.getElementById('modal-lote').classList.remove('open');}
+
+function renderPicker(){
+  const q=document.getElementById('cp-search').value.toLowerCase();
+  const fd=document.getElementById('cp-dueno').value;
+  let list=monedas.filter(m=>{
+    const txt=[m.pais,m.anio,m.denominacion,m.material,m.dueno,m.coleccion].join(' ').toLowerCase();
+    return txt.includes(q)&&(!fd||m.dueno===fd);
+  });
+  const c=document.getElementById('cp-list');
+  if(!list.length){c.innerHTML='<div style="padding:20px;text-align:center;color:var(--text3);font-size:13px">Sin resultados</div>';return;}
+  c.innerHTML=list.map(m=>{
+    const chk=selIds.has(m.id)?'checked':'';
+    const img=m.imgMain&&m.imgMain[0]?`<img src="${m.imgMain[0]}">`:'<div class="cp-ico">🪙</div>';
+    return`<div class="cp-item" onclick="toggleSel('${m.id}')">
+      <input type="checkbox" ${chk} onclick="event.stopPropagation();toggleSel('${m.id}')">
+      ${img}
+      <div class="cp-info"><div class="cp-name">${m.pais||'?'} ${m.anio||''} — ${m.denominacion||'Sin denominación'}</div>
+      <div class="cp-sub">${m.material||''}${m.material&&m.dueno?' · ':''}${m.dueno?'👤 '+m.dueno:''}</div></div>
+      ${m.precioUSD?`<span class="badge bv">U$ ${m.precioUSD}</span>`:''}
+    </div>`;
+  }).join('');
+}
+function toggleSel(id){if(selIds.has(id))selIds.delete(id);else selIds.add(id);updSelCount();renderPicker();}
+function updSelCount(){document.getElementById('sel-count').textContent=selIds.size+' seleccionada'+(selIds.size!==1?'s':'');}
+
+function saveLote(){
+  const nombre=document.getElementById('l-nombre').value.trim();
+  if(!nombre){showToast('⚠️ Ponele un nombre al lote');return;}
+  if(selIds.size===0){showToast('⚠️ Seleccioná al menos una moneda');return;}
+  const l={id:editingLoteId||Date.now().toString(),nombre,dueno:document.getElementById('l-dueno').value,desc:document.getElementById('l-desc').value.trim(),monedaIds:[...selIds],fecha:new Date().toLocaleDateString('es-AR')};
+  if(editingLoteId){const i=lotes.findIndex(x=>x.id===editingLoteId);lotes[i]=l;showToast('✅ Lote actualizado');}
+  else{lotes.push(l);showToast('✅ Lote creado: '+nombre);}
+  save();closeLoteModal();renderLotes();
+}
+function deleteLote(id){if(!confirm('¿Eliminar este lote?'))return;lotes=lotes.filter(l=>l.id!==id);save();renderLotes();showToast('🗑️ Lote eliminado');}
+
+function lotesOf(coinId){return lotes.filter(l=>l.monedaIds.includes(coinId));}
+
+function renderLotes(){
+  const grid=document.getElementById('lotes-grid'), empty=document.getElementById('lotes-empty');
+  if(!lotes.length){grid.innerHTML='';empty.style.display='block';return;}
+  empty.style.display='none';
+  grid.innerHTML=lotes.map(l=>{
+    const coins=l.monedaIds.map(id=>monedas.find(m=>m.id===id)).filter(Boolean);
+    const tARS=coins.reduce((s,m)=>s+(parseFloat(m.precioARS)||0),0);
+    const tUSD=coins.reduce((s,m)=>s+(parseFloat(m.precioUSD)||0),0);
+    const tEUR=coins.reduce((s,m)=>s+(parseFloat(m.precioEUR)||0),0);
+    const items=coins.slice(0,5).map(m=>{
+      const img=m.imgMain&&m.imgMain[0]?`<img src="${m.imgMain[0]}" style="width:28px;height:28px;border-radius:50%;object-fit:cover;border:1px solid var(--border);flex-shrink:0">`:'<div class="lci-ico">🪙</div>';
+      return`<div class="lci">${img}<span style="flex:1">${m.pais||'?'} ${m.anio||''} <em style="color:var(--text2)">— ${m.denominacion||''}</em></span>${m.dueno?`<span class="badge bb" style="font-size:10px">${m.dueno}</span>`:''}</div>`;
+    }).join('');
+    const more=coins.length>5?`<div style="text-align:center;font-size:12px;color:var(--text2);padding:5px">+${coins.length-5} más</div>`:'';
+    return`<div class="lote-card">
+      <div class="lote-header">
+        <div class="lote-title">📦 ${l.nombre}</div>
+        <div class="lote-meta"><span>🪙 ${coins.length} moneda${coins.length!==1?'s':''}</span>${l.dueno?`<span>👤 ${l.dueno}</span>`:''}<span>📅 ${l.fecha}</span></div>
+        ${l.desc?`<div class="lote-desc-txt">"${l.desc}"</div>`:''}
+      </div>
+      <div class="lote-body">
+        <div class="lote-coin-list">${items}${more}</div>
+        <div class="lote-totals">
+          ${tARS?`<div class="lt"><span>Total ARS</span><strong>$${tARS.toLocaleString('es-AR')}</strong></div>`:''}
+          ${tUSD?`<div class="lt"><span>Total USD</span><strong>U$ ${tUSD.toLocaleString('es-AR')}</strong></div>`:''}
+          ${tEUR?`<div class="lt"><span>Total EUR</span><strong>€ ${tEUR.toLocaleString('es-AR')}</strong></div>`:''}
+        </div>
+      </div>
+      <div class="lote-footer">
+        <button class="btn btn-danger" onclick="deleteLote('${l.id}')">🗑️</button>
+        <button class="btn btn-secondary" style="font-size:12px;padding:6px 12px" onclick="exportLote('${l.id}')">📊 CSV</button>
+        <button class="btn btn-purple" style="padding:6px 14px;font-size:13px" onclick="openLoteModal('${l.id}')">✏️ Editar</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function exportLote(id){
+  const l=lotes.find(x=>x.id===id); if(!l) return;
+  const coins=l.monedaIds.map(mid=>monedas.find(m=>m.id===mid)).filter(Boolean);
+  const h=['Lote','País','Año','Denominación','Material','Conservación','Dueño','$ ARS','U$ USD','€ EUR'];
+  const r=coins.map(m=>[l.nombre,m.pais,m.anio,m.denominacion,m.material,m.conservacion,m.dueno,m.precioARS,m.precioUSD,m.precioEUR].map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(','));
+  const csv=[h.join(','),...r].join('\n');
+  const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download='lote_'+l.nombre.replace(/\s+/g,'_')+'.csv'; a.click(); showToast('📊 Lote exportado');
+}
+
+// COLLECTION
+function getFiltered(){
+  let list=[...monedas];
+  const q=document.getElementById('fs').value.toLowerCase();
+  const fd=document.getElementById('fd').value;
+  const fm=document.getElementById('fm').value;
+  const fc=document.getElementById('fc').value;
+  const fe=document.getElementById('fe').value;
+  const fco=document.getElementById('fco').value;
+  const fl=document.getElementById('fl').value;
+  if(q)list=list.filter(m=>[m.pais,m.anio,m.denominacion,m.material,m.notas,m.ceca,m.dueno,m.serieNombre,m.motivo].join(' ').toLowerCase().includes(q));
+  if(fd)list=list.filter(m=>m.dueno===fd);
+  if(fm)list=list.filter(m=>m.material===fm);
+  if(fc)list=list.filter(m=>m.conservacion===fc);
+  if(fe==='si')list=list.filter(m=>m.tieneError);
+  if(fe==='no')list=list.filter(m=>!m.tieneError);
+  if(fco)list=list.filter(m=>m.coleccion===fco);
+  if(fl==='en')list=list.filter(m=>lotes.some(l=>l.monedaIds.includes(m.id)));
+  if(fl==='no')list=list.filter(m=>!lotes.some(l=>l.monedaIds.includes(m.id)));
+  if(sortCol)list.sort((a,b)=>{const va=(a[sortCol]||'').toString().toLowerCase(),vb=(b[sortCol]||'').toString().toLowerCase();return va<vb?-sortDir:va>vb?sortDir:0;});
+  return list;
+}
+function sortBy(col){if(sortCol===col)sortDir*=-1;else{sortCol=col;sortDir=1;}renderCol();}
+function bcons(c){if(!c)return`<span class="badge bgr">—</span>`;if(c.includes('FDC')||c.includes('SC'))return`<span class="badge bv">${c}</span>`;if(c.includes('MBC'))return`<span class="badge bb">${c}</span>`;return`<span class="badge bgr">${c}</span>`;}
+
+function renderCol(){
+  const list=getFiltered();
+  const empty=document.getElementById('col-empty');
+  const tv=document.getElementById('view-tabla');
+  const cv=document.getElementById('view-cards');
+  if(!list.length){empty.style.display='block';tv.style.display='none';cv.style.display='none';return;}
+  empty.style.display='none';
+  if(curView==='tabla'){
+    tv.style.display='block';cv.style.display='none';
+    document.getElementById('tbody').innerHTML=list.map(m=>{
+      const ml=lotesOf(m.id);
+      const lb=ml.length?`<span class="badge bp">📦 ${ml.length}</span>`:`<span class="badge bgr">—</span>`;
+      return`<tr onclick="openDetail('${m.id}')" style="cursor:pointer">
+        <td>${m.imgMain&&m.imgMain[0]?`<img class="ct" src="${m.imgMain[0]}">` : '<div class="cp" style="border-radius:50%">🪙</div>'}</td>
+        <td><strong>${m.pais||'—'}</strong></td>
+        <td><span style="font-family:'DM Mono',monospace">${m.anio||'—'}</span></td>
+        <td>${m.denominacion||'—'}</td>
+        <td>${m.material?`<span class="badge bg">${m.material}</span>`:'—'}</td>
+        <td>${bcons(m.conservacion)}</td>
+        <td>${m.dueno?`<span class="badge bb">${m.dueno}</span>`:'—'}</td>
+        <td style="font-family:'DM Mono',monospace;color:var(--green)">${m.precioARS?'$'+Number(m.precioARS).toLocaleString('es-AR'):'—'}</td>
+        <td style="font-family:'DM Mono',monospace;color:var(--green)">${m.precioUSD?'U$'+m.precioUSD:'—'}</td>
+        <td style="font-family:'DM Mono',monospace;color:var(--green)">${m.precioEUR?'€'+m.precioEUR:'—'}</td>
+        <td>${m.tieneError?'<span class="badge br">⚠️ Sí</span>':'<span class="badge bgr">No</span>'}</td>
+        <td>${m.coleccion?`<span class="badge bb">${m.coleccion}</span>`:'—'}</td>
+        <td>${lb}</td>
+        <td onclick="event.stopPropagation()"><div style="display:flex;gap:5px">
+          <button class="btn btn-secondary" style="padding:5px 9px;font-size:12px" onclick="editMoneda('${m.id}')">✏️</button>
+          <button class="btn btn-danger" onclick="deleteMoneda('${m.id}')">🗑️</button>
+        </div></td>
+      </tr>`;
+    }).join('');
+  } else {
+    tv.style.display='none'; cv.style.display='grid';
+    document.getElementById('cards-body').innerHTML=list.map(m=>{
+      const ml=lotesOf(m.id);
+      return`<div class="coin-card" onclick="openDetail('${m.id}')">
+        <div class="card-img">${m.imgMain&&m.imgMain[0]?`<img src="${m.imgMain[0]}">` : '🪙'}</div>
+        <div class="card-body">
+          <div class="card-name">${m.pais||'Sin país'} ${m.anio||''}</div>
+          <div class="card-sub">${m.denominacion||'Sin denominación'}</div>
+          <div class="card-tags">
+            ${m.material?`<span class="badge bg">${m.material}</span>`:''}
+            ${m.conservacion?bcons(m.conservacion):''}
+            ${m.tieneError?'<span class="badge br">⚠️</span>':''}
+            ${m.coleccion?`<span class="badge bb">🏛️ ${m.coleccion}</span>`:''}
+            ${ml.length?`<span class="badge bp">📦 ${ml.length}</span>`:''}
+          </div>
+          <div class="card-prices">
+            ${m.precioARS?`<div class="card-price"><span>$ </span>${Number(m.precioARS).toLocaleString('es-AR')}</div>`:''}
+            ${m.precioUSD?`<div class="card-price"><span>U$ </span>${m.precioUSD}</div>`:''}
+            ${m.precioEUR?`<div class="card-price"><span>€ </span>${m.precioEUR}</div>`:''}
+          </div>
+        </div>
+        <div class="card-footer">
+          <div class="card-owner">👤 ${m.dueno||'Sin asignar'}</div>
+          <div style="display:flex;gap:5px" onclick="event.stopPropagation()">
+            <button class="btn btn-secondary" style="padding:5px 9px;font-size:12px" onclick="editMoneda('${m.id}')">✏️</button>
+            <button class="btn btn-danger" onclick="deleteMoneda('${m.id}')">🗑️</button>
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  }
+}
+function setView(v){curView=v;document.getElementById('vbtn-tabla').classList.toggle('active',v==='tabla');document.getElementById('vbtn-cards').classList.toggle('active',v==='cards');renderCol();}
+function clearFilters(){['fs','fd','fm','fc','fe','fco','fl'].forEach(id=>{const el=document.getElementById(id);if(el)el.value='';});renderCol();}
+
+// MODAL DETAIL
+function openDetail(id){
+  const m=monedas.find(x=>x.id===id); if(!m) return;
+  const fp=(v,s)=>v?`${s}${Number(v).toLocaleString('es-AR')}`:'—';
+  const ml=lotesOf(m.id);
+  document.getElementById('modal-content').innerHTML=`
+    <div class="modal-title">🪙 ${m.pais||'?'} ${m.anio||''} — ${m.denominacion||'Sin denominación'}</div>
+    ${m.imgMain&&m.imgMain.length?`<div class="detail-imgs">${m.imgMain.map(s=>`<img src="${s}">`).join('')}</div>`:''}
+    <div class="detail-grid" style="margin-top:16px">
+      <div class="detail-item"><label>Dueño</label><p>${m.dueno||'—'}</p></div>
+      <div class="detail-item"><label>País</label><p>${m.pais||'—'}</p></div>
+      <div class="detail-item"><label>Año</label><p>${m.anio||'—'}</p></div>
+      <div class="detail-item"><label>Denominación</label><p>${m.denominacion||'—'}</p></div>
+      <div class="detail-item"><label>Material</label><p>${m.material||'—'}</p></div>
+      <div class="detail-item"><label>Conservación</label><p>${m.conservacion||'—'}</p></div>
+      <div class="detail-item"><label>Rareza</label><p>${m.rareza||'—'}</p></div>
+      <div class="detail-item"><label>Ceca</label><p>${m.ceca||'—'}</p></div>
+      <div class="detail-item"><label>$ ARS</label><p>${fp(m.precioARS,'$')}</p></div>
+      <div class="detail-item"><label>U$ USD</label><p>${fp(m.precioUSD,'U$')}</p></div>
+      <div class="detail-item"><label>€ EUR</label><p>${fp(m.precioEUR,'€')}</p></div>
+      <div class="detail-item"><label>Colección</label><p>${m.coleccion||'—'}</p></div>
+      ${m.serieNombre?`<div class="detail-item"><label>Serie</label><p>${m.serieNombre}${m.serieNumero?' ('+m.serieNumero+')':''}</p></div>`:''}
+      ${m.motivo?`<div class="detail-item"><label>Motivo</label><p>${m.motivo}</p></div>`:''}
+      ${m.tirada?`<div class="detail-item"><label>Tirada</label><p>${m.tirada}</p></div>`:''}
+      ${m.notas?`<div class="detail-item" style="grid-column:1/-1"><label>Notas</label><p>${m.notas}</p></div>`:''}
+    </div>
+    ${ml.length?`<div style="margin-top:13px;padding:13px;background:rgba(155,127,212,0.08);border:1px solid rgba(155,127,212,0.2);border-radius:10px">
+      <div style="font-size:10px;color:var(--purple);font-family:'DM Mono',monospace;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px">📦 En Lotes</div>
+      <div style="display:flex;flex-wrap:wrap;gap:5px">${ml.map(l=>`<span class="badge bp">${l.nombre}</span>`).join('')}</div>
+    </div>`:''}
+    ${m.tieneError?`<div style="background:rgba(232,84,58,0.07);border:1px solid rgba(232,84,58,0.18);border-radius:10px;padding:13px;margin-top:13px">
+      <div style="color:var(--accent);font-family:'DM Mono',monospace;font-size:10px;text-transform:uppercase;letter-spacing:0.8px;margin-bottom:8px">⚠️ Error de Acuñación</div>
+      <div class="detail-grid">
+        ${m.errorTipo?`<div class="detail-item"><label>Tipo</label><p>${m.errorTipo}</p></div>`:''}
+        ${m.errorDesc?`<div class="detail-item" style="grid-column:1/-1"><label>Descripción</label><p>${m.errorDesc}</p></div>`:''}
+      </div>
+      ${m.imgError&&m.imgError.length?`<div class="detail-imgs">${m.imgError.map(s=>`<img src="${s}">`).join('')}</div>`:''}
+    </div>`:''}
+    <div class="btn-row" style="margin-top:16px">
+      <button class="btn btn-danger" onclick="deleteMoneda('${m.id}')">🗑️ Eliminar</button>
+      <button class="btn btn-secondary" onclick="editMoneda('${m.id}')">✏️ Editar</button>
+    </div>`;
+  document.getElementById('modal-det').classList.add('open');
+}
+function closeModal(){document.getElementById('modal-det').classList.remove('open');}
+
+// EXPORT
+function exportCSV(){
+  const list=getFiltered();
+  const h=['País','Año','Denominación','Material','Conservación','Dueño','$ ARS','U$ USD','€ EUR','Error','Tipo Error','Colección','Serie','Notas','Lotes'];
+  const r=list.map(m=>{
+    const ln=lotesOf(m.id).map(l=>l.nombre).join('; ');
+    return[m.pais,m.anio,m.denominacion,m.material,m.conservacion,m.dueno,m.precioARS,m.precioUSD,m.precioEUR,m.tieneError?'Sí':'No',m.errorTipo||'',m.coleccion||'',m.serieNombre||'',m.notas||'',ln]
+      .map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(',');
+  });
+  const csv=[h.join(','),...r].join('\n');
+  const a=document.createElement('a'); a.href='data:text/csv;charset=utf-8,\uFEFF'+encodeURIComponent(csv);
+  a.download='monedas_'+new Date().toISOString().slice(0,10)+'.csv'; a.click(); showToast('📊 CSV exportado');
+}
+
+// ===================== BACKUP / IMPORT =====================
+const BACKUP_VERSION = 1;
+
+function exportBackup() {
+  const backup = {
+    _app: 'NumisBase',
+    _version: BACKUP_VERSION,
+    _fecha: new Date().toISOString(),
+    _total: monedas.length,
+    monedas, duenos, colecciones, lotes
+  };
+  const json = JSON.stringify(backup, null, 2);
+  const a = document.createElement('a');
+  const fecha = new Date().toISOString().slice(0,10);
+  const hora = new Date().toTimeString().slice(0,5).replace(':','-');
+  a.href = 'data:application/json;charset=utf-8,' + encodeURIComponent(json);
+  a.download = `numibase_backup_${fecha}_${hora}.json`;
+  a.click();
+  const txt = `💾 Último backup: ${new Date().toLocaleString('es-AR')} (${monedas.length} monedas)`;
+  localStorage.setItem('nb-last-backup', txt);
+  document.getElementById('backup-last-txt').textContent = txt;
+  showToast('✅ Backup exportado correctamente');
+}
+
+let pendingImport = null;
+function openImportModal() {
+  pendingImport = null;
+  document.getElementById('import-file').value = '';
+  document.getElementById('import-preview').style.display = 'none';
+  document.getElementById('import-confirm-btn').style.display = 'none';
+  document.getElementById('backup-drop').querySelector('p').innerHTML = '<strong>Clic para seleccionar</strong> o arrastrá el archivo acá';
+  document.getElementById('modal-import').classList.add('open');
+}
+function closeImportModal() { document.getElementById('modal-import').classList.remove('open'); }
+
+function handleImportFile(input) {
+  const file = input.files && input.files[0];
+  if (!file) return;
+  if (!file.name.endsWith('.json')) { showToast('⚠️ Solo archivos .json'); return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    try {
+      const data = JSON.parse(e.target.result);
+      if (data._app !== 'NumisBase') { showToast('⚠️ El archivo no es un backup de NumisBase'); return; }
+      pendingImport = data;
+      const prev = document.getElementById('import-preview');
+      const fechaBackup = data._fecha ? new Date(data._fecha).toLocaleString('es-AR') : 'Desconocida';
+      prev.innerHTML = `
+        <strong style="color:var(--text);display:block;margin-bottom:8px">📋 Contenido del backup:</strong>
+        📅 Generado: <strong style="color:var(--text)">${fechaBackup}</strong><br>
+        🪙 Monedas: <strong style="color:var(--green)">${(data.monedas||[]).length}</strong><br>
+        👤 Dueños: <strong style="color:var(--blue)">${(data.duenos||[]).length}</strong><br>
+        🏛️ Colecciones: <strong style="color:var(--blue)">${(data.colecciones||[]).length}</strong><br>
+        📦 Lotes: <strong style="color:var(--purple)">${(data.lotes||[]).length}</strong><br>
+        <span style="color:var(--accent);margin-top:8px;display:block;font-size:12px">⚠️ Esto reemplazará todos los datos actuales (${monedas.length} monedas)</span>
+      `;
+      prev.style.display = 'block';
+      document.getElementById('import-confirm-btn').style.display = 'inline-flex';
+    } catch(err) {
+      showToast('⚠️ Archivo inválido o corrupto');
+    }
+  };
+  reader.readAsText(file);
+}
+
+function confirmImport() {
+  if (!pendingImport) return;
+  if (!confirm(`¿Confirmar importación?\n\nEsto reemplazará TODOS los datos actuales (${monedas.length} monedas) con el backup (${(pendingImport.monedas||[]).length} monedas).\n\nEsta acción no se puede deshacer.`)) return;
+  monedas = pendingImport.monedas || [];
+  duenos = pendingImport.duenos || [];
+  colecciones = pendingImport.colecciones || [];
+  lotes = pendingImport.lotes || [];
+  save();
+  syncAll();
+  closeImportModal();
+  showToast(`✅ Importadas ${monedas.length} monedas correctamente`);
+  // refresh current tab
+  renderCol();
+}
+
+function clearAllData() {
+  if (!confirm(`¿Borrar TODOS los datos?\n\n${monedas.length} monedas, ${duenos.length} dueños, ${lotes.length} lotes.\n\n¡Esta acción no se puede deshacer!`)) return;
+  if (!confirm('Segunda confirmación: ¿Estás seguro? Se borrarán todos los datos.')) return;
+  monedas=[]; duenos=['Mi colección']; colecciones=[]; lotes=[];
+  save(); syncAll(); renderCol(); showToast('🗑️ Todos los datos eliminados');
+}
+
+// STATS
+function updateStats(){
+  document.getElementById('st-total').textContent=monedas.length;
+  document.getElementById('st-duenos').textContent=new Set(monedas.map(m=>m.dueno).filter(Boolean)).size;
+  document.getElementById('st-errors').textContent=monedas.filter(m=>m.tieneError).length;
+  document.getElementById('st-lotes').textContent=lotes.length;
+}
+
+// TOAST
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2800);}
+
+// INIT
+syncAll(); updateStats();
+(()=>{ const last=localStorage.getItem("nb-last-backup"); if(last) document.getElementById("backup-last-txt").textContent=last; })();
+</script>
+</body>
+</html>
